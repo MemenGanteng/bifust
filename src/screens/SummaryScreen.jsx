@@ -167,15 +167,26 @@ const SummaryScreen = ({
           <div>
             <p className="text-sm text-amber-700 font-medium">
               {transferData.isScheduled 
-                ? 'Pembuatan jadwal transfer memerlukan verifikasi OTP'
-                : 'Pastikan data penerima sudah sesuai sebelum melanjutkan'
+                ? 'Pembuatan jadwal memerlukan PIN + OTP'
+                : 'Pastikan data penerima sudah sesuai'
               }
             </p>
             {needsExtraOtp && (
               <p className="text-xs text-amber-600 mt-1">
-                Transfer di atas Rp{formatCurrency(highValueThreshold)} memerlukan OTP tambahan saat eksekusi
+                Transfer &gt;Rp{formatCurrency(highValueThreshold)} memerlukan OTP tambahan (2x OTP)
               </p>
             )}
+          </div>
+        </div>
+
+        {/* Execution Time Info */}
+        <div className="bg-blue-50 rounded-2xl p-4 flex gap-3">
+          <InfoIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm text-blue-700 font-medium">Estimasi Waktu Eksekusi</p>
+            <p className="text-xs text-blue-600 mt-0.5">
+              BI-FAST real-time (&lt;30 detik ke rekening tujuan)
+            </p>
           </div>
         </div>
       </div>
@@ -187,10 +198,10 @@ const SummaryScreen = ({
           <span className="text-xl font-bold text-gray-800">Rp{formatCurrency(totalAmount)}</span>
         </div>
         <button
-          onClick={() => onNavigate('otp')}
+          onClick={() => onNavigate('pin')}
           className="w-full bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-3.5 rounded-xl hover:from-red-700 hover:to-red-600 transition-all shadow-lg shadow-red-200 active:scale-[0.98]"
         >
-          Konfirmasi
+          Konfirmasi & Masukkan PIN
         </button>
       </div>
     </div>

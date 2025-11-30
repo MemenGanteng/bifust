@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import StatusBar from '../components/StatusBar';
-import { ChevronLeftIcon, ClockIcon, InfoIcon } from '../components/Icons';
+import { ChevronLeftIcon, ClockIcon, InfoIcon, ShieldCheckIcon } from '../components/Icons';
 
-const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
+const OTPScreen = ({ 
+  onNavigate, 
+  onVerify, 
+  isScheduled,
+  otpType = 'schedule', // 'schedule' | 'highValue'
+  amount = 0,
+}) => {
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -21,16 +27,21 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
     inputRefs.current[0]?.focus();
   }, []);
 
+  // Reset OTP when type changes
+  useEffect(() => {
+    setOtpCode(['', '', '', '', '', '']);
+    setTimer(60);
+    inputRefs.current[0]?.focus();
+  }, [otpType]);
+
   // Handle input change
   const handleChange = (index, value) => {
-    // Only allow numbers
     if (!/^\d*$/.test(value)) return;
 
     const newOtp = [...otpCode];
-    newOtp[index] = value.slice(-1); // Only take last character
+    newOtp[index] = value.slice(-1);
     setOtpCode(newOtp);
 
-    // Auto focus next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -55,7 +66,6 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
     
     setOtpCode(newOtp);
     
-    // Focus last filled input or last input
     const lastFilledIndex = Math.min(pastedData.length, 5);
     inputRefs.current[lastFilledIndex]?.focus();
   };
@@ -71,7 +81,6 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
   const handleVerify = () => {
     if (otpCode.join('').length === 6) {
       setIsVerifying(true);
-      // Simulate verification delay
       setTimeout(() => {
         setIsVerifying(false);
         onVerify();
@@ -81,41 +90,82 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
 
   const isComplete = otpCode.join('').length === 6;
 
+  // Content based on OTP type
+  const otpContent = {
+    schedule: {
+      title: 'Verifikasi Penjadwalan',
+      subtitle: 'Masukkan Kode OTP',
+      description: 'Kami telah mengirimkan kode 6 digit ke nomor handphone Anda',
+      icon: '📱',
+      iconBadge: '✉️',
+      infoText: 'Tidak menerima kode? Pastikan nomor handphone yang terdaftar aktif dan memiliki sinyal.',
+      buttonText: 'Verifikasi Jadwal',
+      headerColor: 'from-red-600 to-red-700',
+    },
+    highValue: {
+      title: 'Verifikasi Nominal Besar',
+      subtitle: 'Konfirmasi Keamanan Tambahan',
+      description: `Transfer >Rp10.000.000 memerlukan verifikasi tambahan untuk keamanan transaksi Anda`,
+      icon: '🔐',
+      iconBadge: '⚠️',
+      infoText: 'Verifikasi tambahan diperlukan untuk transfer dengan nominal besar demi keamanan rekening Anda.',
+      buttonText: 'Konfirmasi Transfer',
+      headerColor: 'from-amber-600 to-amber-700',
+    },
+  };
+
+  const content = otpContent[otpType];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-b-3xl">
+      <div className={`bg-gradient-to-br ${content.headerColor} rounded-b-3xl`}>
         <StatusBar />
         <div className="px-4 py-4 flex items-center gap-3">
           <button 
-            onClick={() => onNavigate('summary')}
+            onClick={() => onNavigate(otpType === 'highValue' ? 'otp' : 'pin')}
             className="text-white hover:bg-white/10 p-2 rounded-xl transition-colors"
           >
             <ChevronLeftIcon className="w-6 h-6" />
           </button>
-          <h1 className="text-white text-lg font-semibold">Verifikasi OTP</h1>
+          <h1 className="text-white text-lg font-semibold">{content.title}</h1>
         </div>
       </div>
 
       <div className="px-6 py-8">
         {/* Illustration */}
         <div className="flex justify-center mb-8">
-          <div className="w-36 h-36 bg-gradient-to-br from-red-100 to-red-50 rounded-full flex items-center justify-center relative">
-            <div className="text-6xl">📱</div>
-            <div className="absolute -bottom-1 -right-1 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg">
-              ✉️
+          <div className={`w-36 h-36 ${otpType === 'highValue' ? 'bg-gradient-to-br from-amber-100 to-amber-50' : 'bg-gradient-to-br from-red-100 to-red-50'} rounded-full flex items-center justify-center relative`}>
+            <div className="text-6xl">{content.icon}</div>
+            <div className={`absolute -bottom-1 -right-1 w-12 h-12 ${otpType === 'highValue' ? 'bg-amber-500' : 'bg-green-500'} rounded-full flex items-center justify-center text-white text-2xl shadow-lg`}>
+              {content.iconBadge}
             </div>
           </div>
         </div>
 
         {/* Title */}
         <div className="text-center mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Masukkan Kode OTP</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">{content.subtitle}</h2>
           <p className="text-gray-500 text-sm">
-            Kami telah mengirimkan kode 6 digit ke nomor<br />
-            handphone Anda <span className="font-medium text-gray-700">••••••••89</span>
+            {content.description}
+            {otpType === 'schedule' && (
+              <><br /><span className="font-medium text-gray-700">••••••••89</span></>
+            )}
           </p>
         </div>
+
+        {/* High Value Warning Badge */}
+        {otpType === 'highValue' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
+            <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <ShieldCheckIcon className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-amber-800">Verifikasi Keamanan Level 2</p>
+              <p className="text-xs text-amber-600">OTP kedua untuk nominal besar</p>
+            </div>
+          </div>
+        )}
 
         {/* OTP Input */}
         <div className="flex justify-center gap-2 mb-6">
@@ -133,7 +183,7 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
               disabled={isVerifying}
               className={`w-12 h-14 text-center text-2xl font-bold bg-white border-2 rounded-xl focus:outline-none transition-all ${
                 digit 
-                  ? 'border-red-500 text-gray-800' 
+                  ? otpType === 'highValue' ? 'border-amber-500 text-gray-800' : 'border-red-500 text-gray-800'
                   : 'border-gray-200 text-gray-400'
               } ${isVerifying ? 'opacity-50' : ''}`}
             />
@@ -143,7 +193,7 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
         {/* Timer */}
         <div className="text-center mb-6">
           {timer > 0 ? (
-            <div className="flex items-center justify-center gap-2 text-red-600">
+            <div className={`flex items-center justify-center gap-2 ${otpType === 'highValue' ? 'text-amber-600' : 'text-red-600'}`}>
               <ClockIcon className="w-5 h-5" />
               <span className="font-medium">
                 Kirim ulang dalam {String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}
@@ -152,7 +202,7 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
           ) : (
             <button 
               onClick={handleResend}
-              className="text-red-600 font-semibold hover:underline"
+              className={`${otpType === 'highValue' ? 'text-amber-600' : 'text-red-600'} font-semibold hover:underline`}
             >
               Kirim Ulang Kode
             </button>
@@ -160,12 +210,27 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
         </div>
 
         {/* Help */}
-        <div className="bg-blue-50 rounded-2xl p-4 flex gap-3 mb-8">
-          <InfoIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-blue-700">
-            Tidak menerima kode? Pastikan nomor handphone yang terdaftar aktif dan memiliki sinyal.
+        <div className={`${otpType === 'highValue' ? 'bg-amber-50' : 'bg-blue-50'} rounded-2xl p-4 flex gap-3 mb-8`}>
+          <InfoIcon className={`w-5 h-5 ${otpType === 'highValue' ? 'text-amber-600' : 'text-blue-600'} flex-shrink-0 mt-0.5`} />
+          <p className={`text-sm ${otpType === 'highValue' ? 'text-amber-700' : 'text-blue-700'}`}>
+            {content.infoText}
           </p>
         </div>
+
+        {/* Step Indicator for High Value */}
+        {otpType === 'highValue' && (
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="flex items-center gap-1">
+              <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center">✓</div>
+              <span className="text-xs text-gray-500">OTP 1</span>
+            </div>
+            <div className="w-8 h-0.5 bg-amber-400"></div>
+            <div className="flex items-center gap-1">
+              <div className="w-6 h-6 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center">2</div>
+              <span className="text-xs text-amber-600 font-medium">OTP 2</span>
+            </div>
+          </div>
+        )}
 
         {/* Submit Button */}
         <button
@@ -173,7 +238,9 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
           disabled={!isComplete || isVerifying}
           className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 ${
             isComplete && !isVerifying
-              ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-200 hover:from-red-700 hover:to-red-600 active:scale-[0.98]'
+              ? otpType === 'highValue'
+                ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-lg shadow-amber-200 hover:from-amber-700 hover:to-amber-600 active:scale-[0.98]'
+                : 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-200 hover:from-red-700 hover:to-red-600 active:scale-[0.98]'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
         >
@@ -183,7 +250,7 @@ const OTPScreen = ({ onNavigate, onVerify, isScheduled }) => {
               <span>Memverifikasi...</span>
             </>
           ) : (
-            'Verifikasi'
+            content.buttonText
           )}
         </button>
       </div>

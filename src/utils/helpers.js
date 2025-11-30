@@ -76,9 +76,10 @@ export const validateAccountNumber = (number) => {
   return cleaned.length >= 10 && cleaned.length <= 16;
 };
 
-// Validasi nominal transfer
-export const validateAmount = (amount, min, max, balance) => {
+// Validasi nominal transfer (termasuk fee)
+export const validateAmount = (amount, min, max, balance, fee = 0) => {
   const numAmount = parseInt(amount) || 0;
+  const totalDebit = numAmount + fee;
   
   if (numAmount < min) {
     return { valid: false, error: `Minimal transfer Rp${formatCurrency(min)}` };
@@ -86,8 +87,8 @@ export const validateAmount = (amount, min, max, balance) => {
   if (numAmount > max) {
     return { valid: false, error: `Maksimal transfer Rp${formatCurrency(max)}` };
   }
-  if (numAmount > balance) {
-    return { valid: false, error: 'Saldo tidak cukup' };
+  if (totalDebit > balance) {
+    return { valid: false, error: `Saldo tidak cukup (butuh Rp${formatCurrency(totalDebit)} termasuk biaya admin)` };
   }
   
   return { valid: true, error: null };

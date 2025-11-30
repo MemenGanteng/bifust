@@ -23,7 +23,7 @@ const HomeScreen = ({ onNavigate, balance, scheduledCount = 0 }) => {
   const [showBalance, setShowBalance] = useState(false);
 
   const quickActions = [
-    { icon: TransferIcon, label: 'Transfer', action: () => onNavigate('transferType') },
+    { icon: TransferIcon, label: 'Transfer', action: () => onNavigate('transferType'), highlight: true },
     { icon: BillIcon, label: 'Tagihan & Isi Ulang', action: null },
     { icon: QRIcon, label: 'Transaksi Tanpa Kartu', action: null },
     { icon: VoucherIcon, label: 'Poin Xtra', action: null },
@@ -33,60 +33,72 @@ const HomeScreen = ({ onNavigate, balance, scheduledCount = 0 }) => {
   const secondaryActions = [
     { icon: VoucherIcon, label: 'Voucher', action: null },
     { icon: HeartIcon, label: 'Penerima Favorit', action: () => onNavigate('favorites') },
-    { icon: BiFastIcon, label: 'BI-FAST', action: () => onNavigate('transferType', { method: 'bifast' }) },
+    { icon: BiFastIcon, label: 'BI-FAST', action: () => onNavigate('transferType', { method: 'bifast' }), highlight: true },
     { icon: SettingsIcon, label: 'Semua Menu', action: null },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-8">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-red-600 via-red-600 to-red-700 rounded-b-3xl pb-6">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pb-20 lg:pb-8">
+      {/* Header with Premium Gradient */}
+      <div className="bg-gradient-to-br from-red-700 via-red-600 to-red-500 rounded-b-[2rem] pb-6 relative overflow-hidden">
+        {/* Decorative circles */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
+        
         <StatusBar />
         
         {/* App Bar */}
-        <div className="px-4 lg:px-8 py-3 flex justify-between items-center">
-          <span className="text-white font-bold text-2xl tracking-tight">OCTO</span>
-          <div className="flex items-center gap-3">
-            <button className="text-white/80 hover:text-white transition-colors p-2">
+        <div className="px-4 lg:px-8 py-3 flex justify-between items-center relative z-10">
+          <div className="flex items-center gap-2">
+            <span className="text-white font-extrabold text-2xl tracking-tight">OCTO</span>
+            <span className="text-white/60 text-xs font-medium bg-white/10 px-2 py-0.5 rounded-full">Mobile</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="text-white/80 hover:text-white hover:bg-white/10 transition-all p-2.5 rounded-xl">
               <HeartIcon className="w-5 h-5" />
             </button>
-            <button className="text-white/80 hover:text-white transition-colors p-2">
+            <button className="text-white/80 hover:text-white hover:bg-white/10 transition-all p-2.5 rounded-xl">
               <SearchIcon className="w-5 h-5" />
             </button>
-            <button className="text-white/80 hover:text-white transition-colors p-2">
+            <button className="text-white/80 hover:text-white hover:bg-white/10 transition-all p-2.5 rounded-xl relative">
               <BellIcon className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-yellow-400 rounded-full"></span>
             </button>
-            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/10 ml-1">
               <UserIcon className="w-5 h-5 text-white" />
             </div>
           </div>
         </div>
 
         {/* Greeting */}
-        <div className="px-4 lg:px-8 mb-4">
-          <h1 className="text-white text-lg lg:text-xl">Selamat siang, <span className="font-semibold">NONI!</span></h1>
+        <div className="px-4 lg:px-8 mb-4 relative z-10">
+          <p className="text-white/70 text-sm">Selamat siang,</p>
+          <h1 className="text-white text-xl lg:text-2xl font-bold">NONI! 👋</h1>
         </div>
 
-        {/* E-Wallet Card */}
-        <div className="mx-4 lg:mx-8 bg-white/10 backdrop-blur-sm rounded-2xl p-4">
+        {/* E-Wallet Card - Glassmorphism */}
+        <div className="mx-4 lg:mx-8 bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20 relative z-10 animate-fadeInUp">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <span className="text-white/80 text-xs font-medium bg-white/20 px-2 py-0.5 rounded">E-Wallet</span>
+              <span className="text-white/90 text-xs font-semibold bg-white/20 px-2.5 py-1 rounded-lg inline-flex items-center gap-1">
+                <WalletIcon className="w-3 h-3" />
+                E-Wallet
+              </span>
               <p className="text-white/60 text-xs mt-2">OCTO Pay (••••3433)</p>
             </div>
-            <button className="bg-white text-red-600 text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-1 hover:bg-gray-100 transition-colors">
+            <button className="bg-white text-red-600 text-sm font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 hover:bg-gray-50 hover:shadow-lg transition-all active:scale-95">
               <PlusIcon className="w-4 h-4" />
               Isi Ulang
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-white/70 text-sm">IDR</span>
-            <span className="text-white text-2xl lg:text-3xl font-bold">
+            <span className="text-white/70 text-sm font-medium">IDR</span>
+            <span className="text-white text-3xl lg:text-4xl font-extrabold tracking-tight">
               {showBalance ? formatCurrency(balance) : '••••••••'}
             </span>
             <button 
               onClick={() => setShowBalance(!showBalance)}
-              className="text-white/70 hover:text-white transition-colors ml-1"
+              className="text-white/60 hover:text-white hover:bg-white/10 transition-all ml-1 p-1.5 rounded-lg"
             >
               {showBalance ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
             </button>
@@ -99,16 +111,16 @@ const HomeScreen = ({ onNavigate, balance, scheduledCount = 0 }) => {
         <div className="lg:grid lg:grid-cols-3 lg:gap-6">
           {/* Left Column - Quick Actions */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-4">
+            <div className="bg-white rounded-2xl shadow-premium p-4 animate-fadeInUp stagger-1">
               {/* Tabs */}
-              <div className="flex gap-2 mb-4 overflow-x-auto">
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
                 {['Untukmu', 'Transaksi', 'Produk', 'Lainnya'].map((tab, i) => (
                   <button 
                     key={tab}
-                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all whitespace-nowrap ${
+                    className={`px-4 py-2 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
                       i === 1 
-                        ? 'bg-red-600 text-white' 
-                        : 'text-gray-500 hover:bg-gray-100'
+                        ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-glow-red' 
+                        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
                     }`}
                   >
                     {tab}
@@ -123,14 +135,18 @@ const HomeScreen = ({ onNavigate, balance, scheduledCount = 0 }) => {
                     key={i}
                     onClick={item.action}
                     disabled={!item.action}
-                    className={`flex flex-col items-center gap-2 p-2 lg:p-3 rounded-xl transition-all ${
-                      item.action ? 'hover:bg-gray-50 active:bg-gray-100' : 'opacity-60'
+                    className={`flex flex-col items-center gap-2 p-2 lg:p-3 rounded-xl transition-all group ${
+                      item.action ? 'hover:bg-gray-50 active:scale-95' : 'opacity-50 cursor-not-allowed'
                     }`}
                   >
-                    <div className="w-11 h-11 lg:w-14 lg:h-14 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                    <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center transition-all ${
+                      item.highlight 
+                        ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-glow-red group-hover:scale-105' 
+                        : 'bg-red-50 text-red-600 group-hover:bg-red-100'
+                    }`}>
                       <item.icon className="w-5 h-5 lg:w-6 lg:h-6" />
                     </div>
-                    <span className="text-[10px] lg:text-xs text-gray-600 text-center leading-tight">{item.label}</span>
+                    <span className="text-[10px] lg:text-xs text-gray-600 text-center leading-tight font-medium">{item.label}</span>
                   </button>
                 ))}
               </div>
@@ -142,14 +158,18 @@ const HomeScreen = ({ onNavigate, balance, scheduledCount = 0 }) => {
                     key={i}
                     onClick={item.action}
                     disabled={!item.action}
-                    className={`flex flex-col items-center gap-2 p-2 lg:p-3 rounded-xl transition-all ${
-                      item.action ? 'hover:bg-gray-50 active:bg-gray-100' : 'opacity-60'
+                    className={`flex flex-col items-center gap-2 p-2 lg:p-3 rounded-xl transition-all group ${
+                      item.action ? 'hover:bg-gray-50 active:scale-95' : 'opacity-50 cursor-not-allowed'
                     }`}
                   >
-                    <div className="w-11 h-11 lg:w-14 lg:h-14 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center">
+                    <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center transition-all ${
+                      item.highlight 
+                        ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-md group-hover:scale-105' 
+                        : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                    }`}>
                       <item.icon className="w-5 h-5 lg:w-6 lg:h-6" />
                     </div>
-                    <span className="text-[10px] lg:text-xs text-gray-600 text-center leading-tight">{item.label}</span>
+                    <span className="text-[10px] lg:text-xs text-gray-600 text-center leading-tight font-medium">{item.label}</span>
                   </button>
                 ))}
                 {/* Empty slot for alignment */}
@@ -161,19 +181,19 @@ const HomeScreen = ({ onNavigate, balance, scheduledCount = 0 }) => {
             {scheduledCount > 0 && (
               <button
                 onClick={() => onNavigate('scheduledList')}
-                className="w-full mt-4 bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex items-center gap-4"
+                className="w-full mt-4 bg-white rounded-2xl p-4 shadow-premium hover:shadow-lg transition-all flex items-center gap-4 group animate-fadeInUp stagger-2"
               >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center justify-center relative">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center justify-center relative shadow-glow-red group-hover:scale-105 transition-transform">
                   <TransferIcon className="w-6 h-6" />
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-gradient-to-br from-green-400 to-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-md animate-bounce-gentle">
                     {scheduledCount}
                   </span>
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-semibold text-gray-800">Transfer Terjadwal Aktif</p>
-                  <p className="text-xs text-gray-500">{scheduledCount} jadwal berjalan</p>
+                  <p className="font-bold text-gray-800 text-lg">Transfer Terjadwal Aktif</p>
+                  <p className="text-sm text-gray-500">{scheduledCount} jadwal sedang berjalan</p>
                 </div>
-                <span className="text-red-600 text-sm font-medium">Kelola →</span>
+                <span className="text-red-600 text-sm font-bold group-hover:translate-x-1 transition-transform">Kelola →</span>
               </button>
             )}
           </div>

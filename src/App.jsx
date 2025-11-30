@@ -4,6 +4,7 @@ import TransferTypeScreen from './screens/TransferTypeScreen';
 import SelectBankScreen from './screens/SelectBankScreen';
 import TransferFormScreen from './screens/TransferFormScreen';
 import SummaryScreen from './screens/SummaryScreen';
+import PINScreen from './screens/PINScreen';
 import OTPScreen from './screens/OTPScreen';
 import SuccessScreen from './screens/SuccessScreen';
 import ScheduledListScreen from './screens/ScheduledListScreen';
@@ -11,6 +12,7 @@ import ScheduleDetailScreen from './screens/ScheduleDetailScreen';
 import ExecutionHistoryScreen from './screens/ExecutionHistoryScreen';
 import FavoriteRecipientsScreen from './screens/FavoriteRecipientsScreen';
 import { generateTransactionId, generateReferenceNumber, formatDateTime } from './utils/helpers';
+import { highValueThreshold } from './data/banks';
 
 function App() {
   // Navigation state
@@ -45,6 +47,9 @@ function App() {
     referenceNumber: '',
     time: '',
   });
+
+  // OTP type for high value transfers
+  const [otpType, setOtpType] = useState('schedule'); // 'schedule' | 'highValue'
 
   // Scheduled transfers (dummy data for demo)
   const [scheduledTransfers, setScheduledTransfers] = useState([
@@ -153,6 +158,7 @@ function App() {
       referenceNumber: '',
       time: '',
     });
+    setOtpType('schedule');
   };
 
   // Navigation handler
@@ -193,8 +199,26 @@ function App() {
     setSelectedBank(bank);
   };
 
+  // Handle PIN verification success
+  const handlePinVerify = (pin) => {
+    // PIN verified, go to OTP
+    setOtpType('schedule');
+    setCurrentScreen('otp');
+  };
+
   // Handle OTP verification success
   const handleOtpVerify = () => {
+    const amount = parseInt(transferData.amount);
+    
+    // Check if high value and first OTP just completed
+    if (amount > highValueThreshold && otpType === 'schedule') {
+      // Need second OTP for high value
+      setOtpType('highValue');
+      setCurrentScreen('otpHighValue');
+      return;
+    }
+    
+    // All verification complete, process transaction
     const txId = generateTransactionId();
     const refNum = generateReferenceNumber();
     const txTime = formatDateTime(new Date());
@@ -256,13 +280,19 @@ function App() {
 
   // Handle favorite actions
   const handleAddFavorite = (recipient) => {
+    // Check if already exists
+    const exists = favoriteRecipients.some(f => 
+      f.accountNumber === recipient.accountNumber && f.bankCode === recipient.bankCode
+    );
+    if (exists) return;
+
     const newFav = {
       id: 'FAV' + Date.now(),
       name: recipient.name,
       accountNumber: recipient.accountNumber,
-      bankCode: recipient.bankCode,
-      bankName: recipient.bankName,
-      bankColor: recipient.bankColor,
+      bankCode: recipient.bankCode || selectedBank?.code,
+      bankName: recipient.bank || selectedBank?.name,
+      bankColor: recipient.bankColor || selectedBank?.color,
     };
     setFavoriteRecipients(prev => [newFav, ...prev]);
   };
@@ -324,12 +354,34 @@ function App() {
           />
         );
       
+      case 'pin':
+        return (
+          <PINScreen 
+            onNavigate={handleNavigate}
+            onVerifyPIN={handlePinVerify}
+            transferData={transferData}
+          />
+        );
+      
       case 'otp':
         return (
           <OTPScreen 
             onNavigate={handleNavigate}
             onVerify={handleOtpVerify}
             isScheduled={transferData.isScheduled}
+            otpType="schedule"
+            amount={parseInt(transferData.amount) || 0}
+          />
+        );
+      
+      case 'otpHighValue':
+        return (
+          <OTPScreen 
+            onNavigate={handleNavigate}
+            onVerify={handleOtpVerify}
+            isScheduled={transferData.isScheduled}
+            otpType="highValue"
+            amount={parseInt(transferData.amount) || 0}
           />
         );
       

@@ -86,7 +86,8 @@ const TransferFormScreen = ({
       newErrors.account = 'Nomor rekening tidak valid';
     }
     
-    const amountValidation = validateAmount(amount, limits.min, limits.max, balance);
+    // Include fee in validation
+    const amountValidation = validateAmount(amount, limits.min, limits.max, balance, fee);
     if (!amountValidation.valid) {
       newErrors.amount = amountValidation.error;
     }

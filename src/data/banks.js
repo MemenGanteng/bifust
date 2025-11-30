@@ -3,14 +3,8 @@
 // Contoh: logo: '/images/banks/bca.png'
 
 export const banks = [
-  { 
-    id: 'cimb', 
-    name: 'Bank CIMB Niaga', 
-    code: 'CIMB', 
-    color: '#B71C1C',
-    logo: null, // cimb.png
-    methods: ['bifast', 'online', 'rtgs']
-  },
+  // CIMB Niaga tidak termasuk karena ini transfer antar bank (BI-FAST)
+  // Transfer sesama CIMB Niaga = transfer intrabank (gratis, bukan BI-FAST)
   { 
     id: 'bca', 
     name: 'Bank Central Asia', 
@@ -128,15 +122,15 @@ export const transferFees = {
 export const transferLimits = {
   bifast: {
     min: 10000,
-    max: 250000000,
+    max: 250000000, // Rp 250 juta
   },
   online: {
     min: 10000,
-    max: 100000000,
+    max: 50000000, // Rp 50 juta (sesuai standar realtime online)
   },
   rtgs: {
     min: 100000000,
-    max: 1000000000,
+    max: 1000000000, // Rp 1 miliar
   },
 };
 
